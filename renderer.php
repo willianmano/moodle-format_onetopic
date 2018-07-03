@@ -217,7 +217,7 @@ class format_onetopic_renderer extends format_section_renderer_base {
         }
 
         // Start single-section div.
-        echo html_writer::start_tag('div', array('class' => 'single-section onetopic'));
+        echo html_writer::start_tag('div', array('class' => 'single-section onetopic', 'id' => 'onetopictabs'));
 
         // Move controls.
         $canmove = false;
@@ -276,6 +276,7 @@ class format_onetopic_renderer extends format_section_renderer_base {
 
                     $customstyles = '';
                     $level = 0;
+                    $icon = '';
                     if (is_array($formatoptions)) {
 
                         if (!empty($formatoptions['fontcolor'])) {
@@ -292,6 +293,10 @@ class format_onetopic_renderer extends format_section_renderer_base {
 
                         if (isset($formatoptions['level'])) {
                             $level = $formatoptions['level'];
+                        }
+
+                        if (isset($formatoptions['icon']) && $formatoptions['icon'] != '') {
+                            $icon = "<i class='fa fa-{$formatoptions['icon']}'></i> ";
                         }
                     }
 
@@ -314,9 +319,16 @@ class format_onetopic_renderer extends format_section_renderer_base {
                         }
                     }
 
-                    $newtab = new tabobject("tab_topic_" . $section, $url,
-                    '<div style="' . $customstyles . '" class="tab_content ' . $specialstyle . '">' .
-                    '<span>' . $sectionname . "</span></div>", $sectionname);
+                    $headtabcontent = "<div style='{$customstyles}' class='tab_content {$specialstyle}'>
+                        <span>{$sectionname}</span></div>";
+
+                    if ($icon) {
+                        $headtabcontent = "<div style='{$customstyles}' class='tab_content {$specialstyle}'>
+                            <span class='icon-tab'>{$icon}{$sectionname}</span>
+                          </div>";
+                    }
+
+                    $newtab = new tabobject("tab_topic_" . $section, $url, $headtabcontent, $sectionname);
 
                     if (is_array($formatoptions) && isset($formatoptions['level'])) {
 
@@ -392,7 +404,7 @@ class format_onetopic_renderer extends format_section_renderer_base {
         $sectionnavlinks = $this->get_nav_links($course, $sections, $displaysection);
         $sectiontitle = '';
 
-        if (!$course->hidetabsbar && count($tabs[0]) > 0) {
+        if (!$course->hidetabsbar && !empty($tabs[0])) {
 
             if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
 
