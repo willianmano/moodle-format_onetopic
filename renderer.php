@@ -235,6 +235,8 @@ class format_onetopic_renderer extends format_section_renderer_base {
 
         $defaulttopic = -1;
 
+        $sectionsicons = [];
+
         while ($section <= $this->numsections) {
 
             if ($course->realcoursedisplay == COURSE_DISPLAY_MULTIPAGE && $section == 0) {
@@ -277,6 +279,7 @@ class format_onetopic_renderer extends format_section_renderer_base {
                     $customstyles = '';
                     $level = 0;
                     $icon = '';
+                    $sectionsicons[$section] = '';
                     if (is_array($formatoptions)) {
 
                         if (!empty($formatoptions['fontcolor'])) {
@@ -297,6 +300,7 @@ class format_onetopic_renderer extends format_section_renderer_base {
 
                         if (isset($formatoptions['icon']) && $formatoptions['icon'] != '') {
                             $icon = "<i class='fa fa-{$formatoptions['icon']}'></i> ";
+                            $sectionsicons[$section] = $icon;
                         }
                     }
 
@@ -400,12 +404,17 @@ class format_onetopic_renderer extends format_section_renderer_base {
             $section++;
         }
 
-        // Title with section navigation links.
         $sectionnavlinks = $this->get_nav_links($course, $sections, $displaysection);
         $sectiontitle = '';
 
-        if (!$course->hidetabsbar && !empty($tabs[0])) {
+        // Title with section navigation links.
+        if (!empty($tabs[$displaysection])) {
+            $sectiontitle = $tabs[$displaysection]->title;
+            $sectionicon = $sectionsicons[$displaysection];
+            $sectiontitle = html_writer::tag('h2', $sectionicon . " " . $sectiontitle, array('class' => 'section-title'));
+        }
 
+        if (!$course->hidetabsbar && !empty($tabs[0])) {
             if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
 
                 // Increase number of sections.
